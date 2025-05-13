@@ -1,0 +1,125 @@
+<div class="container">
+  <h2>Járművek</h2>
+
+  <!-- Új jármű hozzáadása -->
+  <form (ngSubmit)="addVehicle()" #vehicleForm="ngForm" class="mb-4">
+    <div class="row g-3">
+
+      <!-- Típus -->
+      <div class="col-md-4">
+        <label for="type">Jármű típusa</label>
+        <select
+          [(ngModel)]="newVehicle.type"
+          name="type"
+          id="type"
+          class="form-select"
+          required>
+          <option value="auto">Autó</option>
+          <option value="hajo">Hajó</option>
+        </select>
+      </div>
+
+      <!-- Gyártó -->
+      <div class="col-md-4">
+        <label for="manufacturer">Gyártó</label>
+        <input type="text" id="manufacturer" name="manufacturer" class="form-control" [(ngModel)]="newVehicle.manufacturer" required />
+      </div>
+
+      <!-- Modell -->
+      <div class="col-md-4">
+        <label for="model">Modell</label>
+        <input type="text" id="model" name="model" class="form-control" [(ngModel)]="newVehicle.model" required />
+      </div>
+
+      <!-- Rendszám -->
+      <div class="col-md-4">
+        <label for="licensePlate">Rendszám</label>
+        <input
+          type="text"
+          id="licensePlate"
+          name="licensePlate"
+          class="form-control"
+          [(ngModel)]="newVehicle.licensePlate"
+          [pattern]="newVehicle.type === 'hajo' ? 'H-[0-9]{5}' : '[A-Z]{2}-[A-Z]{2}-[0-9]{3}'"
+          [maxlength]="newVehicle.type === 'hajo' ? 7 : 9"
+          required
+        />
+        <small class="text-muted">
+          {{ newVehicle.type === 'hajo' ? 'Pl. H-12345' : 'Pl. AA-AA-123' }}
+        </small>
+      </div>
+
+      <!-- Beszerzés dátuma -->
+      <div class="col-md-4">
+        <label for="acquisitionDate">Beszerzés dátuma</label>
+        <input
+          type="date"
+          id="acquisitionDate"
+          name="acquisitionDate"
+          class="form-control"
+          [(ngModel)]="newVehicle.acquisitionDate"
+          required />
+      </div>
+
+      <!-- Alvázszám -->
+      <div class="col-md-4">
+        <label for="serialNumber">Alvázszám</label>
+        <input
+          type="text"
+          id="serialNumber"
+          name="serialNumber"
+          class="form-control"
+          [(ngModel)]="newVehicle.serialNumber"
+          required
+          pattern=".{17}"
+          minlength="17"
+          maxlength="17" />
+        <small class="text-muted">17 karakter</small>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary mt-3" type="submit" [disabled]="!vehicleForm.form.valid">Hozzáadás</button>
+
+    <div *ngIf="error" class="alert alert-danger mt-2">{{ error }}</div>
+  </form>
+
+  <!-- Keresés -->
+  <input
+    type="text"
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="applyFilter()"
+    placeholder="Keresés: típus, rendszám, gyártó, modell"
+    class="form-control mb-3"
+    name="searchTerm" />
+
+  <!-- Jármű lista -->
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Típus</th>
+        <th>Gyártó</th>
+        <th>Modell</th>
+        <th>Rendszám</th>
+        <th>Alvázszám</th>
+        <th>Beszerzés</th>
+        <th>Státusz</th>
+        <th>Művelet</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let v of filteredVehicles">
+        <td>{{ v.type === 'auto' ? 'Autó' : 'Hajó' }}</td>
+        <td>{{ v.manufacturer }}</td>
+        <td>{{ v.model }}</td>
+        <td>{{ v.licensePlate }}</td>
+        <td>{{ v.serialNumber }}</td>
+        <td>{{ v.acquisitionDate | date: 'yyyy/MM/dd' }}</td>
+        <td>{{ v.status }}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" (click)="deleteVehicle(v.id)">Törlés</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

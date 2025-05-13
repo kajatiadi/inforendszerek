@@ -1,0 +1,127 @@
+<div class="container">
+  <!-- Modal ablak -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">{{ modalTitle }}</div>
+      <div class="modal-body" [innerHTML]="modalMessage"></div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Új kölcsönzés -->
+  <h2>Új kölcsönzés</h2>
+
+  <form (ngSubmit)="submitRental()" class="mb-4">
+    <div class="row g-2">
+      <div class="col-md-4">
+        <select [(ngModel)]="rental.customerId" name="customerId" class="form-select" required>
+          <option [ngValue]="null">-- Ügyfél kiválasztása --</option>
+          <option *ngFor="let c of customers" [value]="c.id">{{ c.fullName }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <select [(ngModel)]="rental.vehicleId" name="vehicleId" class="form-select" required>
+          <option [ngValue]="null">-- Jármű kiválasztása --</option>
+          <option *ngFor="let v of vehicles" [value]="v.id">{{ v.type }} – {{ v.licensePlate }} -{{ v.manufacturer }} {{ v.model }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <input [(ngModel)]="rental.startDate" name="startDate" type="date" class="form-control" required />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Kölcsönzés mentése</button>
+  </form>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ success }}</span>
+    <button type="button" class="btn-close" aria-label="Bezárás" (click)="success = ''"></button>
+  </div>
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ error }}</span>
+    <button type="button" class="btn-close" aria-label="Bezárás" (click)="error = ''"></button>
+  </div>
+
+  <!-- Aktív kölcsönzések visszahozása -->
+  <hr />
+  <h3>Aktív kölcsönzések visszahozása</h3>
+
+  <div *ngFor="let r of activeRentals" class="card my-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <h5 class="card-title">
+          {{ r.customer.fullName }} – {{ r.vehicle.licensePlate }}
+        </h5>
+        <button class="btn btn-danger btn-sm" (click)="deleteRental(r.id)">Törlés</button>
+      </div>
+      <p class="card-text">
+        Indulás dátuma: {{ r.startDate | date }}<br />
+        Jármű: {{ r.vehicle.type }} – {{ r.vehicle.manufacturer }} {{ r.vehicle.model }}
+      </p>
+
+      <form (ngSubmit)="submitReturn(r.id)">
+        <div class="row g-2">
+          <div class="col-md-4">
+            <label>Visszahozás dátuma</label>
+            <input [(ngModel)]="returnForms[r.id].endDate" name="endDate{{r.id}}" type="date" class="form-control" required />
+          </div>
+          <div class="col-md-4">
+            <label>Futott km</label>
+            <input [(ngModel)]="returnForms[r.id].distanceKm" name="km{{r.id}}" type="number" class="form-control" required />
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="returnForms[r.id].damaged" name="damaged{{r.id}}" id="damaged{{r.id}}" />
+              <label class="form-check-label" [for]="'damaged' + r.id">Sérült?</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+          <button type="submit" class="btn btn-success">Lezárás</button>
+        </div>
+      </form>
+
+      <div *ngIf="returnForms[r.id]?.error" class="alert alert-danger mt-2">
+        {{ returnForms[r.id].error }}
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="activeRentals.length === 0" class="text-muted">Nincs aktív kölcsönzés.</p>
+
+<!-- Lezárt kölcsönzések -->
+<hr />
+<h3>Lezárt kölcsönzések</h3>
+
+<table class="table table-bordered table-striped" *ngIf="closedRentals.length > 0">
+  <thead>
+    <tr>
+      <th>Ügyfél</th>
+      <th>Jármű</th>
+      <th>Indulás</th>
+      <th>Visszahozva</th>
+      <th>Díj</th>
+      <th>Művelet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of closedRentals">
+      <td>{{ r.customer.fullName }}</td>
+      <td>{{ r.vehicle.licensePlate }} ({{ r.vehicle.model }})</td>
+      <td>{{ r.startDate | date: 'yyyy.MM.dd' }}</td>
+      <td>{{ r.endDate | date: 'yyyy.MM.dd' }}</td>
+      <td>{{ r.totalPrice != null ? (r.totalPrice | number:'1.0-0') + ' Ft' : '—' }}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" (click)="deleteRental(r.id)">Törlés</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="closedRentals.length === 0" class="text-muted">Nincs lezárt kölcsönzés.</p>
+</div>

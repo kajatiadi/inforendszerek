@@ -1,0 +1,8 @@
+<div class="login-box">
+    <h2>Bejelentkezés</h2>
+    <input [(ngModel)]="username" placeholder="Felhasználónév" />
+    <input [(ngModel)]="password" placeholder="Jelszó" type="password" />
+    <button (click)="login()">Belépés</button>
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </div>
+  

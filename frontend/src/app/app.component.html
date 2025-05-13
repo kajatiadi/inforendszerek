@@ -1,0 +1,22 @@
+<nav class="navbar navbar-light bg-light px-3 mb-4">
+  <a class="navbar-brand" routerLink="/">Autókölcsönző</a>
+
+  <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-between">
+    <!-- Bal oldali menüpontok -->
+    <div class="d-flex gap-2">
+      <a routerLink="/vehicles" class="btn btn-outline-primary">Járművek</a>
+      <a routerLink="/customers" class="btn btn-outline-primary">Ügyfelek</a>
+      <a routerLink="/rentals" class="btn btn-outline-primary">Kölcsönzések</a>
+    </div>
+
+    <!-- Jobb oldali menüpontok -->
+    <div class="d-flex gap-2 align-items-center">
+      <span *ngIf="isLoggedIn()" class="text-muted">{{ username }}</span>
+      <button *ngIf="isLoggedIn()" class="btn btn-outline-secondary" (click)="logout()">Kijelentkezés</button>
+      <a *ngIf="!isLoggedIn()" routerLink="/login" class="btn btn-outline-primary">Bejelentkezés</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Router outlet a fő tartalomnak -->
+<router-outlet></router-outlet>
